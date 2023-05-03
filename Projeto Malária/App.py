@@ -14,9 +14,10 @@ import sys
 
 #Descomente o diretorio que funciona com voce
 
-#imagem = cv2.imread(r'C:\Users\macel\Downloads\malaria\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
-# imagem = io.imread (r'C:\Users\mathe\Projeto-PI\Projeto Malária\malaria\images\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png') // esse funciona
+#imagem = cv2.imread(r'C:\Users\macel\OneDrive\Área de Trabalho\Projetos\PI\Projeto Malaria\Projeto-PI\Projeto Malária\malaria\Example\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
+imagem = io.imread (r'C:\Users\macel\OneDrive\Área de Trabalho\Projetos\PI\Projeto Malaria\Projeto-PI\Projeto Malária\malaria\Example\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
 #imagem = io.imread('./malaria/images/0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
+imagem = cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB)
 canais = cv2.split(imagem)
 
 
@@ -43,29 +44,29 @@ acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,total_num_peaks 
 fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(20, 8))
 image = color.gray2rgb(red_img)
 
-centers = []  # armazena os centros dos círculos já desenhados
+centros = []  # armazena os centros dos círculos já desenhados
 min_dist = 30  # distância mínima desejada entre os centros dos círculos
 
-for center_y, center_x, radius in zip(b, a, raio):
+for centro_y, centro_x, radius in zip(b, a, raio):
     # verifica se o centro atual está próximo demais de um círculo já desenhado
     is_close = False
-    for c in centers:
-        dist = np.sqrt((center_y - c[0])**2 + (center_x - c[1])**2)
+    for c in centros:
+        dist = np.sqrt((centro_y - c[0])**2 + (centro_x - c[1])**2)
         if dist < min_dist:
             is_close = True
             break
     if not is_close:
-        circy, circx = circle_perimeter(center_y, center_x, radius, shape=image.shape)
+        circy, circx = circle_perimeter(centro_y, centro_x, radius, shape=image.shape)
         image[circy, circx] = (220, 20, 20)
-        centers.append((center_y, center_x))
+        centros.append((centro_y, centro_x))
 
 ax.imshow(image, cmap=plt.cm.gray)
 
-num_circles = np.sum(~np.isnan(centers))
-print(len(centers))
+num_circles = np.sum(~np.isnan(centros))
+print(len(centros))
 
-# for center_y, center_x, radius in zip(b, a, raio):
-#     circy, circx = circle_perimeter(center_y, center_x, radius, shape = image.shape)
+# for centro_y, centro_x, radius in zip(b, a, raio):
+#     circy, circx = circle_perimeter(centro_y, centro_x, radius, shape = image.shape)
 #     image[circy, circx] = (200, 20, 20)
 
 # ax.imshow(image, cmap=plt.cm.gray)
@@ -75,6 +76,13 @@ if imagem is None:
     print('Não foi possível carregar a imagem')
 else:
     cv2.imshow('Imagem', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+if imagem is None:
+    print('Não foi possível carregar a imagem')
+else:
+    cv2.imshow('Imagem', edges)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 # if imagem is None:
