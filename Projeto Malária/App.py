@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+
 from skimage import io
 from skimage import color
 from skimage.filters import sobel
+from scipy.spatial.distance import cdist
 from skimage.draw import circle_perimeter
 from skimage.morphology import *
 from skimage.transform import hough_circle_peaks, hough_circle
@@ -10,52 +12,72 @@ import numpy as np
 import cv2
 import sys
 
-imagem = io.imread("0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png")
-red_img = imagem [:, :, 0]
-green_img = imagem [:, :, 1]
-blue_img = imagem [:, :, 2]
 
-print(red_img)
+imagem = cv2.imread(r'C:\Users\macel\Downloads\malaria\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
+canais = cv2.split(imagem)
 
-print(green_img)
 
-print(blue_img)
+red_img = canais[2]
+green_img = canais [1]
+blue_img = canais [0]
 
-_,ax = plt.subplots (1,2)
-ax[0].imshow (red_img,cmap='gray',vmin=0,vmax=255)
-ax[1].imshow (green_img,cmap='gray',vmin=0,vmax=255)
-_,ax = plt.subplots (1,2)
-ax[0].imshow (green_img,cmap='gray',vmin=0,vmax=255)
-ax[1].imshow (blue_img,cmap='gray',vmin=0,vmax=255)
-_,ax = plt.subplots (1,2)
-ax[0].imshow (red_img,cmap='gray',vmin=0,vmax=255)
-ax[1].imshow (blue_img,cmap='gray',vmin=0,vmax=255)
-
-binaria = blue_img.copy()
+binaria = red_img.copy()
 limiar = imagem.max() * (110 / 256)
 binaria [binaria <= limiar] = 0
 binaria [binaria > 0] = 1
 
-print(binaria * 255)
-
 binary = binary_opening (binaria)
 binary = binary_closing (binaria)
 
-print(binary)
-
 edges = sobel(binary)
-print(edges)
 
-raios = np.arange(40, 50, 2)
+raios = np.arange(30, 45, 2)
 hough_grade = hough_circle (edges, raios)
 
-acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,total_num_peaks = 150)
+acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,total_num_peaks = 200)
+
+
 fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(20, 8))
-image = color.gray2rgb(blue_img)
+image = color.gray2rgb(red_img)
+
+centers = []  # armazena os centros dos círculos já desenhados
+min_dist = 20  # distância mínima desejada entre os centros dos círculos
 
 for center_y, center_x, radius in zip(b, a, raio):
-    circy, circx = circle_perimeter(center_y, center_x, radius, shape = image.shape)
-    image[circy, circx] = (220, 20, 20)
+    # verifica se o centro atual está próximo demais de um círculo já desenhado
+    is_close = False
+    for c in centers:
+        dist = np.sqrt((center_y - c[0])**2 + (center_x - c[1])**2)
+        if dist < min_dist:
+            is_close = True
+            break
+    if not is_close:
+        circy, circx = circle_perimeter(center_y, center_x, radius, shape=image.shape)
+        image[circy, circx] = (220, 20, 20)
+        centers.append((center_y, center_x))
 
 ax.imshow(image, cmap=plt.cm.gray)
-print(len(a))
+
+num_circles = np.sum(~np.isnan(centers))
+print(len(centers))
+
+# for center_y, center_x, radius in zip(b, a, raio):
+#     circy, circx = circle_perimeter(center_y, center_x, radius, shape = image.shape)
+#     image[circy, circx] = (200, 20, 20)
+
+# ax.imshow(image, cmap=plt.cm.gray)
+
+
+if imagem is None:
+    print('Não foi possível carregar a imagem')
+else:
+    cv2.imshow('Imagem', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+# if imagem is None:
+#     print('Não foi possível carregar a imagem')
+# else:
+#     cv2.imshow('Imagem', canais[1])
+#     print(canais[1].shape)
+#     cv2.waitKey(0)
+#     cv2.destroyAllWindows()
