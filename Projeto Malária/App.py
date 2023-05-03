@@ -13,7 +13,9 @@ import cv2
 import sys
 
 
-imagem = cv2.imread(r'C:\Users\macel\Downloads\malaria\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
+# imagem = cv2.imread(r'C:\Users\macel\Downloads\malaria\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
+# imagem = io.imread (r'C:\Users\mathe\Projeto-PI\Projeto Malária\malaria\images\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png') // esse funciona
+imagem = io.imread('./malaria/images/0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
 canais = cv2.split(imagem)
 
 
