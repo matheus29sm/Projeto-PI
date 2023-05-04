@@ -15,9 +15,7 @@ import os
 
 #imagem = cv2.imread(r'C:\Users\macel\OneDrive\Área de Trabalho\Projetos\PI\Projeto Malaria\Projeto-PI\Projeto Malária\malaria\Example\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
 imagem = io.imread (r'C:\Users\macel\OneDrive\Área de Trabalho\Projetos\PI\Projeto Malaria\Projeto-PI\Projeto Malária\malaria\Example\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
-#imagem = io.imread('./malaria/images/0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
-#imagem = io.imread(r'C:\Users\macel\OneDrive\Área de Trabalho\Projetos\PI\Projeto Malaria\Projeto-PI\Projeto Malária\malaria\Example\8d02117d-6c71-4e47-b50a-6cc8d5eb1d55.png')
-
+# imagem = io.imread(r'C:\Users\mathe\Projeto-PI\Projeto Malária\malaria\Example\0ac747cd-ff32-49bf-bc1a-3e9b7702ce9c.png')
 
 canal = cv2.split(imagem)
 
@@ -81,12 +79,13 @@ print(len(centros))
 #     # ax[2].imshow(edges2)
 #     plt.show()
 
-if imagem is None:
-    print('Não foi possível carregar a imagem')
-else:
-    cv2.imshow('Imagem', image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+# if imagem is None:
+#     print('Não foi possível carregar a imagem')
+# else:
+#     cv2.imshow('Imagem', image)
+#     cv2.waitKey(0)
+#     cv2.destroyAllWindows()
+
 # if imagem is None:
 #     print('Não foi possível carregar a imagem')
 # else:
@@ -101,24 +100,27 @@ else:
 #     print(canais[1].shape)
 #     cv2.waitKey(0)
 #     cv2.destroyAllWindows()
-# pasta = r'Projeto-PI\Projeto Malária\malaria\images'
-# def get_image_paths(pasta):
-#     """
-#     Retorna uma lista com os caminhos das imagens na pasta especificada.
-#     """
-#     image_extensions = ['.jpg', '.jpeg', '.png', '.bmp']  # Adicione outras extensões de imagem, se necessário
-#     image_paths = []
-#     for filename in os.listdir(pasta):
-#         if any(filename.lower().endswith(ext) for ext in image_extensions):
-#             image_paths.append(os.path.join(pasta, filename))
-#     return image_paths
-# imagens = get_image_paths(pasta)
 
-# for img in imagens:
-#     if img is None:
-#         print('Não foi possível carregar a imagem')
-#     else:
-#         img = io.imread(img)
-#         cv2.imshow('Imagem', img)
-#         cv2.waitKey(0)
-#         cv2.destroyAllWindows()
+pasta = r'Projeto-PI\Projeto Malária\malaria\images'
+# pasta = r'Projeto Malária\malaria\images'
+
+def get_image_paths(pasta):
+    """
+    Retorna uma lista com os caminhos das imagens na pasta especificada.
+    """
+    image_extensions = ['.jpg', '.jpeg', '.png', '.bmp']  # Adicione outras extensões de imagem, se necessário
+    image_paths = []
+    for filename in os.listdir(pasta):
+        if any(filename.lower().endswith(ext) for ext in image_extensions):
+            image_paths.append(os.path.join(pasta, filename))
+    return image_paths
+imagens = get_image_paths(pasta)
+
+for img in imagens:
+    if img is None:
+        print('Não foi possível carregar a imagem')
+    else:
+        img = io.imread(img)
+        cv2.imshow('Imagem', img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
