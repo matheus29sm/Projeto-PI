@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import skimage.filters as skifil
 from skimage import io
 from skimage import color
 from skimage.filters import sobel
@@ -6,6 +7,7 @@ from skimage.draw import circle_perimeter
 from skimage.morphology import *
 from skimage.transform import hough_circle_peaks, hough_circle
 from skimage.exposure import equalize_hist
+from skimage.measure import label, regionprops
 import numpy as np
 import cv2
 import os
@@ -25,8 +27,8 @@ def pegar_caminho_imagens(pasta):
 # para o professor testar era uma boa o de baixo.
 
 # pasta = r'Projeto-PI\Projeto Malária\malaria\images'
-# pasta = 'Projeto-PI/Projeto Malária/malaria/images' # o seu tem que analisar e dx igual 
-pasta = 'Projeto Malária/malaria/images' # o meu
+pasta = 'Projeto-PI/Projeto Malária/malaria/images' # o seu tem que analisar e dx igual 
+#pasta = 'Projeto Malária/malaria/images' # o meu
 
 imagens = pegar_caminho_imagens(pasta)
 
@@ -36,26 +38,51 @@ for img in imagens:
     else:
         img = io.imread(img)
         canal = cv2.split(img)
+        blue_img = canal [1]
 
-        blue_img = canal [0]
+        gray_img = blue_img #color.rgb2gray(blue_img)
 
-        binaria = blue_img.copy()
-        limiar = img.max() * (110 / 256)
-        binaria [binaria <= limiar] = 0
-        binaria [binaria > 0] = 255
+        thresh = skifil.threshold_otsu(gray_img)
+        
+        binaria = gray_img > thresh
 
-        binary = binary_opening (binaria)
-        binary = binary_closing (binaria)
+        # Rotular os objetos conectados na imagem binária
+        etiqueta = label(binaria)
 
-        edges = sobel(binary)
+        # Extrair as propriedades dos objetos, incluindo sua área
+        props = regionprops(etiqueta)
 
+        # Filtrar os objetos por área para manter apenas as células
+        min_area = 50  # definir a área mínima para manter
+        cells = []
+        for prop in props:
+            if prop.area >= min_area:
+                cells.append(prop)
+        mascara = np.logical_and(gray_img > thresh, etiqueta > 0)
 
-        raios = np.arange(42, 48, 2)
-        hough_grade = hough_circle (edges, raios)
+        edges = sobel(gray_img)
+        #talvez o erro estaja aki
+        mascara = edges * mascara
+        
+        elem_estrut_dilat = disk(3)
+        elem_estrut_eros = disk (5)
 
-        acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 300)
+        img_dilatada = dilation(mascara, elem_estrut_dilat)
+        img_erodida = erosion(img_dilatada, elem_estrut_eros)
 
-        image = color.gray2rgb(blue_img)
+        img_equazada = equalize_hist(img_erodida)
+
+        img_de_sobel = sobel(img_equazada)
+
+        img_de_sobel [img_de_sobel < 0.3] = 0
+        img_de_sobel [img_de_sobel >= 0.3] = 1
+
+        raios = np.arange(42, 60, 2)
+        hough_grade = hough_circle (img_de_sobel, raios)
+
+        acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 150)
+
+        image = color.gray2rgb(gray_img)
 
         centros = []  # armazena os centros dos círculos já desenhados
         # min_dist = 30  # distância mínima desejada entre os centros dos círculos
@@ -181,3 +208,70 @@ for img in imagens:
 #     print(canais[1].shape)
 #     cv2.waitKey(0)
 #     cv2.destroyAllWindows()
+# img_sobel = sobel(gray_img)
+
+    # mascara = img_sobel * mascara
+
+
+
+
+
+
+
+
+# for img in imagens:
+#     if img is None:
+#         print('Não foi possível carregar a imagem')
+#     else:
+#         img = io.imread(img)
+#         canal = cv2.split(img)
+
+#         blue_img = canal [0]
+
+#         binaria = blue_img.copy()
+#         limiar = img.max() * (110 / 256)
+#         binaria [binaria <= limiar] = 0
+#         binaria [binaria > 0] = 255
+
+#         binary = binary_opening (binaria)
+#         binary = binary_closing (binaria)
+
+#         edges = sobel(binary)
+
+
+#         raios = np.arange(42, 48, 2)
+#         hough_grade = hough_circle (edges, raios)
+
+#         acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 300)
+
+#         image = color.gray2rgb(blue_img)
+
+#         centros = []  # armazena os centros dos círculos já desenhados
+#         # min_dist = 30  # distância mínima desejada entre os centros dos círculos
+
+#         for centro_y, centro_x, radius in zip(b, a, raio):
+#             # verifica se o centro atual está próximo demais de um círculo já desenhado
+#             is_close = False
+#             for c in centros:
+#                 dist = np.sqrt((centro_y - c[0])**2 + (centro_x - c[1])**2)
+#                 #  if dist < min_dist:
+#                 #     is_close = True
+#                 #     break
+#             if not is_close:
+#                 circy, circx = circle_perimeter(centro_y, centro_x, radius, shape=image.shape)
+#                 image[circy, circx] = (20, 20, 220) #BGR
+#                 centros.append((centro_y, centro_x))
+
+
+#         num_circles = np.sum(~np.isnan(centros))
+#         print(len(centros))
+#         # cv2.imshow('Imagem',canal[2])
+#         cv2.imshow('Imagem', image)
+#         cv2.waitKey(0)
+#         cv2.destroyAllWindows()
+#         # fig, ax = plt.subplots(1,2, figsize=(24,12))
+#         # ax[0].axis("off")
+#         # ax[0].imshow(img)
+#         # ax[1].axis("off")
+#         # ax[1].imshow(canal[0])
+#         # plt.show()
