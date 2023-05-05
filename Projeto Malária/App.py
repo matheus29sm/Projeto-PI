@@ -37,25 +37,27 @@ for img in imagens:
         img = io.imread(img)
         canal = cv2.split(img)
 
-        blue_img = canal [0]
+        blue_img = canal[1]  # teste no canal de saturação
 
         binaria = blue_img.copy()
         limiar = img.max() * (110 / 256)
         binaria [binaria <= limiar] = 0
         binaria [binaria > 0] = 255
 
-        binary = binary_opening (binaria)
-        binary = binary_closing (binaria)
+        # binary = binary_opening (binaria)
+        # binary = binary_closing (binaria)
 
-        edges = sobel(binary)
+        edges = sobel(binaria)
+
+        # edges = binary_fillholes(edges)
 
 
-        raios = np.arange(42, 48, 2)
+        raios = np.arange(42, 60, 2)
         hough_grade = hough_circle (edges, raios)
 
-        acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 300)
+        acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 100)
 
-        image = color.gray2rgb(blue_img)
+        image = color.gray2rgb(edges)
 
         centros = []  # armazena os centros dos círculos já desenhados
         # min_dist = 30  # distância mínima desejada entre os centros dos círculos
@@ -74,6 +76,7 @@ for img in imagens:
                 centros.append((centro_y, centro_x))
 
 
+        # image = img
         num_circles = np.sum(~np.isnan(centros))
         print(len(centros))
         # cv2.imshow('Imagem',canal[2])
@@ -87,7 +90,32 @@ for img in imagens:
         # ax[1].imshow(canal[0])
         # plt.show()
 
+# new = 'Projeto Malária/malaria/training.json' # ideia e pesquisar os links no arquivo e ver se acha 
 
+# import json
+
+# # define objeto_python fora do bloco with
+# objeto_python = None
+
+# # abre o arquivo JSON
+# with open(new) as arquivo:
+#     # lê cada linha do arquivo e trata como um objeto JSON
+#     for linha in arquivo:
+#         try:
+#             objeto_python = json.loads(linha)
+#             # fazer algo com o objeto Python aqui
+#         except json.JSONDecodeError:
+#             # lidar com linhas inválidas ou vazias, se necessário
+#             pass
+
+# for img in imagens:
+#     # procurando uma string em um dicionário dentro do objeto Python
+#     procurar_string = img[23:]
+#     if procurar_string in objeto_python["endereco"].values():
+#         print("A string '{}' foi encontrada no arquivo JSON!".format(procurar_string))
+#     else:
+
+# 23
 # -- Teste imagem unica --  
  
 #Descomente o diretorio que funciona com voce
