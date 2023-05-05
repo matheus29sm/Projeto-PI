@@ -1,4 +1,4 @@
- {"image": {"checksum": "11fff0da0b75689a228b32d09722ce6d", "pathname": "/images/0ab56f9a-846d-49e2-a617-c6cc477fdfad.png", 
+[{"image": {"checksum": "11fff0da0b75689a228b32d09722ce6d", "pathname": "/images/0ab56f9a-846d-49e2-a617-c6cc477fdfad.png", 
  "shape": {"r": 1200, "c": 1600, "channels": 3}}, 
  "objects": [
     {"bounding_box": {"minimum": {"r": 370, "c": 809}, "maximum": {"r": 486, "c": 924}}, "category": "red blood cell"},
@@ -875,4 +875,4 @@
        {"bounding_box": {"minimum": {"r": 276, "c": 374}, "maximum": {"r": 418, "c": 518}}, "category": "red blood cell"}, 
        {"bounding_box": {"minimum": {"r": 441, "c": 876}, "maximum": {"r": 617, "c": 955}}, "category": "red blood cell"}, 
        {"bounding_box": {"minimum": {"r": 436, "c": 201}, "maximum": {"r": 543, "c": 316}}, "category": "red blood cell"}, 
-       {"bounding_box": {"minimum": {"r": 1065, "c": 740}, "maximum": {"r": 1156, "c": 841}}, "category": "red blood cell"}]},
+       {"bounding_box": {"minimum": {"r": 1065, "c": 740}, "maximum": {"r": 1156, "c": 841}}, "category": "red blood cell"}]}]
