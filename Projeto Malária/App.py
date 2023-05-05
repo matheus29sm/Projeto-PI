@@ -90,7 +90,7 @@ imagens = pegar_caminho_imagens(pasta)
 #         # ax[1].imshow(canal[0])
 #         # plt.show()
 
-new = 'Projeto Malária/malaria/new.json' # ideia e pesquisar os links no arquivo e ver se acha 
+new = 'Projeto Malária/malaria/training.json' # ideia e pesquisar os links no arquivo e ver se acha 
 
 import json
 
@@ -106,7 +106,17 @@ for img in imagens:
     for item in objeto_python:
         if procurar_string in item['image']['pathname']:
             print("A string '{}' foi encontrada no arquivo JSON!".format(procurar_string),cont)
-            # print(item['objects']['bounding_box']['category'] != "red blood cell") #pega os bouding box // ta errado
+            # itera sobre cada objeto e verifica sua categoria
+            objetos = item['objects']
+            for objeto in objetos:
+                # if "bounding_box" in objeto:
+                    if "category" in objeto:
+                        if objeto["category"] != "red blood cell":
+                            print(objeto["category"])
+                    else:
+                        print("Objeto não tem categoria definida.")
+                # else:
+                #     print("Objeto não tem caixa delimitadora (bounding box) definida.")
             break
         else:
             # print("A string '{}' não foi encontrada no arquivo JSON.".format(procurar_string))
