@@ -30,90 +30,117 @@ pasta = 'Projeto Malária/malaria/images' # o meu
 
 imagens = pegar_caminho_imagens(pasta)
 
+# for img in imagens:
+#     if img is None:
+#         print('Não foi possível carregar a imagem')
+#     else:
+#         img = io.imread(img)
+#         canal = cv2.split(img)
+
+#         blue_img = canal[1]  # teste no canal de saturação
+
+#         binaria = blue_img.copy()
+#         limiar = img.max() * (110 / 256)
+#         binaria [binaria <= limiar] = 0
+#         binaria [binaria > 0] = 255
+
+#         # binary = binary_opening (binaria)
+#         # binary = binary_closing (binaria)
+
+#         edges = sobel(binaria)
+
+#         # edges = binary_fillholes(edges)
+
+
+#         raios = np.arange(42, 60, 2)
+#         hough_grade = hough_circle (edges, raios)
+
+#         acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 100)
+
+#         image = color.gray2rgb(edges)
+
+#         centros = []  # armazena os centros dos círculos já desenhados
+#         # min_dist = 30  # distância mínima desejada entre os centros dos círculos
+
+#         for centro_y, centro_x, radius in zip(b, a, raio):
+#             # verifica se o centro atual está próximo demais de um círculo já desenhado
+#             is_close = False
+#             for c in centros:
+#                 dist = np.sqrt((centro_y - c[0])**2 + (centro_x - c[1])**2)
+#                 #  if dist < min_dist:
+#                 #     is_close = True
+#                 #     break
+#             if not is_close:
+#                 circy, circx = circle_perimeter(centro_y, centro_x, radius, shape=image.shape)
+#                 image[circy, circx] = (20, 20, 220) #BGR
+#                 centros.append((centro_y, centro_x))
+
+
+#         # image = img
+#         num_circles = np.sum(~np.isnan(centros))
+#         print(len(centros))
+#         # cv2.imshow('Imagem',canal[2])
+#         cv2.imshow('Imagem', image)
+#         cv2.waitKey(0)
+#         cv2.destroyAllWindows()
+#         # fig, ax = plt.subplots(1,2, figsize=(24,12))
+#         # ax[0].axis("off")
+#         # ax[0].imshow(img)
+#         # ax[1].axis("off")
+#         # ax[1].imshow(canal[0])
+#         # plt.show()
+
+new = 'Projeto Malária/malaria/new.json' # ideia e pesquisar os links no arquivo e ver se acha 
+
+import json
+
+# abre o arquivo JSON
+with open(new) as arquivo:
+    # lê todo o arquivo e converte para um objeto Python
+    objeto_python = json.load(arquivo)
+
+cont = 0
 for img in imagens:
-    if img is None:
-        print('Não foi possível carregar a imagem')
-    else:
-        img = io.imread(img)
-        canal = cv2.split(img)
+    # procurando uma string em um dicionário dentro do objeto Python
+    procurar_string = img[31:]
+    for item in objeto_python:
+        if procurar_string in item['image']['pathname']:
+            print("A string '{}' foi encontrada no arquivo JSON!".format(procurar_string),cont)
+            # print(item['objects']['bounding_box']['category'] != "red blood cell") #pega os bouding box // ta errado
+            break
+        else:
+            # print("A string '{}' não foi encontrada no arquivo JSON.".format(procurar_string))
+            # print(item['image']['pathname'],cont)
+            # print(procurar_string)
+            cont += 1
 
-        blue_img = canal[1]  # teste no canal de saturação
-
-        binaria = blue_img.copy()
-        limiar = img.max() * (110 / 256)
-        binaria [binaria <= limiar] = 0
-        binaria [binaria > 0] = 255
-
-        # binary = binary_opening (binaria)
-        # binary = binary_closing (binaria)
-
-        edges = sobel(binaria)
-
-        # edges = binary_fillholes(edges)
-
-
-        raios = np.arange(42, 60, 2)
-        hough_grade = hough_circle (edges, raios)
-
-        acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 100)
-
-        image = color.gray2rgb(edges)
-
-        centros = []  # armazena os centros dos círculos já desenhados
-        # min_dist = 30  # distância mínima desejada entre os centros dos círculos
-
-        for centro_y, centro_x, radius in zip(b, a, raio):
-            # verifica se o centro atual está próximo demais de um círculo já desenhado
-            is_close = False
-            for c in centros:
-                dist = np.sqrt((centro_y - c[0])**2 + (centro_x - c[1])**2)
-                #  if dist < min_dist:
-                #     is_close = True
-                #     break
-            if not is_close:
-                circy, circx = circle_perimeter(centro_y, centro_x, radius, shape=image.shape)
-                image[circy, circx] = (20, 20, 220) #BGR
-                centros.append((centro_y, centro_x))
-
-
-        # image = img
-        num_circles = np.sum(~np.isnan(centros))
-        print(len(centros))
-        # cv2.imshow('Imagem',canal[2])
-        cv2.imshow('Imagem', image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        # fig, ax = plt.subplots(1,2, figsize=(24,12))
-        # ax[0].axis("off")
-        # ax[0].imshow(img)
-        # ax[1].axis("off")
-        # ax[1].imshow(canal[0])
-        # plt.show()
-
-# new = 'Projeto Malária/malaria/training.json' # ideia e pesquisar os links no arquivo e ver se acha 
-
-# import json
 
 # # define objeto_python fora do bloco with
 # objeto_python = None
 
 # # abre o arquivo JSON
+# # with open(new) as arquivo:
+# #     # lê cada linha do arquivo e trata como um objeto JSON
+# #     for linha in arquivo:
+# #         try:
+# #             objeto_python = json.loads(linha)
+# #             # fazer algo com o objeto Python aqui
+# #         except json.JSONDecodeError:
+# #             # lidar com linhas inválidas ou vazias, se necessário
+# #             pass
+
+# # abre o arquivo JSON
 # with open(new) as arquivo:
-#     # lê cada linha do arquivo e trata como um objeto JSON
-#     for linha in arquivo:
-#         try:
-#             objeto_python = json.loads(linha)
-#             # fazer algo com o objeto Python aqui
-#         except json.JSONDecodeError:
-#             # lidar com linhas inválidas ou vazias, se necessário
-#             pass
+#     # carrega o conteúdo do arquivo JSON em um objeto Python
+#     objeto_python = json.load(arquivo)
 
 # for img in imagens:
 #     # procurando uma string em um dicionário dentro do objeto Python
 #     procurar_string = img[23:]
-#     if procurar_string in objeto_python["endereco"].values():
+#     if procurar_string in objeto_python["image"].values():
 #         print("A string '{}' foi encontrada no arquivo JSON!".format(procurar_string))
 #     else:
+#         print("A string '{}' não foi encontrada no arquivo JSON!".format(procurar_string))
 
 # 23
 # -- Teste imagem unica --  
