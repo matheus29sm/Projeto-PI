@@ -26,11 +26,20 @@ def pegar_caminho_imagens(pasta):
 # descomente o de cima apenas se o de baixo não funcionar 
 # para o professor testar era uma boa o de baixo.
 
-# pasta = r'Projeto-PI\Projeto Malária\malaria\images'
-pasta = 'Projeto-PI/Projeto Malária/malaria/images' # o seu tem que analisar e dx igual 
+pasta = 'Projeto-PI/Projeto_Malaria/malaria/images' # o seu tem que analisar e dx igual 
 #pasta = 'Projeto Malária/malaria/images' # o meu
 
 imagens = pegar_caminho_imagens(pasta)
+
+def suavizar_img(img):
+
+    elem_estrut_dilat = disk(3)
+    elem_estrut_eros = disk (5)
+
+    dilatada = dilation(img, elem_estrut_dilat)
+    erodida = erosion(dilatada, elem_estrut_eros)
+
+    return erodida
 
 for img in imagens:
     if img is None:
@@ -64,21 +73,25 @@ for img in imagens:
         #talvez o erro estaja aki
         mascara = edges * mascara
         
-        elem_estrut_dilat = disk(3)
-        elem_estrut_eros = disk (5)
+        # elem_estrut_dilat = disk(3)
+        # elem_estrut_eros = disk (5)
 
-        img_dilatada = dilation(mascara, elem_estrut_dilat)
-        img_erodida = erosion(img_dilatada, elem_estrut_eros)
+        # img_dilatada = dilation(mascara, elem_estrut_dilat)
+        # img_erodida = erosion(img_dilatada, elem_estrut_eros)
 
-        img_equazada = equalize_hist(img_erodida)
+        img_result = suavizar_img(mascara)
 
-        img_de_sobel = sobel(img_equazada)
+        img_equazada = equalize_hist(img_result)
 
-        img_de_sobel [img_de_sobel < 0.3] = 0
-        img_de_sobel [img_de_sobel >= 0.3] = 1
+        img_sobel = sobel(img_equazada)
 
-        raios = np.arange(42, 60, 2)
-        hough_grade = hough_circle (img_de_sobel, raios)
+        img_sobel [img_sobel < 0.3] = 0
+        img_sobel [img_sobel >= 0.3] = 1
+
+        img_result = img_sobel #suavizar_img(img_sobel)
+
+        raios = np.arange(42, 58, 2)
+        hough_grade = hough_circle (img_result, raios)
 
         acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 150)
 
