@@ -21,11 +21,7 @@ def pegar_caminho_imagens(pasta):
             caminho_imagens.append(os.path.join(pasta, arquivo))
     return caminho_imagens
 
-# descomente o de cima apenas se o de baixo não funcionar 
-# para o professor testar era uma boa o de baixo.
-
-# pasta = 'Projeto-PI/Projeto_Malaria/malaria/images' # o seu tem que analisar e dx igual 
-pasta = 'Projeto_Malaria/malaria/images' # o meu
+pasta = 'Projeto_Malaria/malaria/images' 
 
 imagens = pegar_caminho_imagens(pasta)
 
@@ -107,7 +103,6 @@ for img in imagens:
     for item in objeto_python:
         if procurar_string in item['image']['pathname']:
             print("'{}' foi encontrada no arquivo JSON!".format(procurar_string),cont ,i)
-            # itera sobre cada objeto e verifica sua categoria
             objetos = item['objects']
             for objeto in objetos:
                 # if "bounding_box" in objeto:
@@ -126,34 +121,6 @@ for img in imagens:
             cont += 1
 
 
-# # define objeto_python fora do bloco with
-# objeto_python = None
-
-# # abre o arquivo JSON
-# # with open(new) as arquivo:
-# #     # lê cada linha do arquivo e trata como um objeto JSON
-# #     for linha in arquivo:
-# #         try:
-# #             objeto_python = json.loads(linha)
-# #             # fazer algo com o objeto Python aqui
-# #         except json.JSONDecodeError:
-# #             # lidar com linhas inválidas ou vazias, se necessário
-# #             pass
-
-# # abre o arquivo JSON
-# with open(new) as arquivo:
-#     # carrega o conteúdo do arquivo JSON em um objeto Python
-#     objeto_python = json.load(arquivo)
-
-# for img in imagens:
-#     # procurando uma string em um dicionário dentro do objeto Python
-#     procurar_string = img[23:]
-#     if procurar_string in objeto_python["image"].values():
-#         print("A string '{}' foi encontrada no arquivo JSON!".format(procurar_string))
-#     else:
-#         print("A string '{}' não foi encontrada no arquivo JSON!".format(procurar_string))
-
-# 23
 # -- Teste imagem unica --  
  
 #Descomente o diretorio que funciona com voce
