@@ -100,12 +100,14 @@ with open(new) as arquivo:
     objeto_python = json.load(arquivo)
 
 cont = 0
+i = 0
 for img in imagens:
     # procurando uma string em um dicionário dentro do objeto Python
     procurar_string = img[31:]
+    i +=1
     for item in objeto_python:
         if procurar_string in item['image']['pathname']:
-            print("'{}' foi encontrada no arquivo JSON!".format(procurar_string),cont)
+            print("'{}' foi encontrada no arquivo JSON!".format(procurar_string),cont ,i)
             # itera sobre cada objeto e verifica sua categoria
             objetos = item['objects']
             for objeto in objetos:
