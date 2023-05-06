@@ -23,11 +23,8 @@ def pegar_caminho_imagens(pasta):
             caminho_imagens.append(os.path.join(pasta, arquivo))
     return caminho_imagens
 
-# descomente o de cima apenas se o de baixo não funcionar 
-# para o professor testar era uma boa o de baixo.
 
-pasta = 'Projeto-PI/Projeto_Malaria/malaria/images' # o seu tem que analisar e dx igual 
-#pasta = 'Projeto Malária/malaria/images' # o meu
+pasta = 'Projeto_Malaria/malaria/images'
 
 imagens = pegar_caminho_imagens(pasta)
 
@@ -83,15 +80,16 @@ for img in imagens:
 
         img_equazada = equalize_hist(img_result)
 
-        img_sobel = sobel(img_equazada)
+        img_sobel = sobel(img_equazada) 
+        
+        img_sobel [img_sobel < 128] = 0
+        img_sobel [img_sobel >= 128] = 255
 
-        img_sobel [img_sobel < 0.3] = 0
-        img_sobel [img_sobel >= 0.3] = 1
-
-        img_result = img_sobel #suavizar_img(img_sobel)
+        print(img_sobel)
+        img_result =  suavizar_img(img_sobel)
 
         raios = np.arange(42, 58, 2)
-        hough_grade = hough_circle (img_result, raios)
+        hough_grade = hough_circle (img_sobel, raios)
 
         acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 150)
 
@@ -117,15 +115,17 @@ for img in imagens:
         num_circles = np.sum(~np.isnan(centros))
         print(len(centros))
         # cv2.imshow('Imagem',canal[2])
-        cv2.imshow('Imagem', image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        # fig, ax = plt.subplots(1,2, figsize=(24,12))
-        # ax[0].axis("off")
-        # ax[0].imshow(img)
-        # ax[1].axis("off")
-        # ax[1].imshow(canal[0])
-        # plt.show()
+        # cv2.imshow('Imagem', img_equazada)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+        fig, ax = plt.subplots(1, 3, figsize=(24,12))
+        ax[0].axis("off")
+        ax[0].imshow(canal[0])
+        ax[1].axis("off")
+        ax[1].imshow(canal[1])
+        ax[2].axis("off")
+        ax[2].imshow(canal[2])
+        plt.show()
 
 
 # -- Teste imagem unica --  
