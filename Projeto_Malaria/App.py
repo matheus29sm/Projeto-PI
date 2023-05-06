@@ -24,9 +24,8 @@ def pegar_caminho_imagens(pasta):
 # descomente o de cima apenas se o de baixo não funcionar 
 # para o professor testar era uma boa o de baixo.
 
-# pasta = r'Projeto-PI\Projeto Malária\malaria\images'
-# pasta = 'Projeto-PI/Projeto Malária/malaria/images' # o seu tem que analisar e dx igual 
-pasta = 'Projeto Malária/malaria/images' # o meu
+# pasta = 'Projeto-PI/Projeto_Malaria/malaria/images' # o seu tem que analisar e dx igual 
+pasta = 'Projeto_Malaria/malaria/images' # o meu
 
 imagens = pegar_caminho_imagens(pasta)
 
@@ -90,7 +89,7 @@ imagens = pegar_caminho_imagens(pasta)
 #         # ax[1].imshow(canal[0])
 #         # plt.show()
 
-new = 'Projeto Malária/malaria/training.json' # ideia e pesquisar os links no arquivo e ver se acha 
+new = 'Projeto_Malaria/malaria/training.json' # ideia e pesquisar os links no arquivo e ver se acha 
 
 import json
 
