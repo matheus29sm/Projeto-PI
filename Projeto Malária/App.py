@@ -105,7 +105,7 @@ for img in imagens:
     procurar_string = img[31:]
     for item in objeto_python:
         if procurar_string in item['image']['pathname']:
-            print("A string '{}' foi encontrada no arquivo JSON!".format(procurar_string),cont)
+            print("'{}' foi encontrada no arquivo JSON!".format(procurar_string),cont)
             # itera sobre cada objeto e verifica sua categoria
             objetos = item['objects']
             for objeto in objetos:
