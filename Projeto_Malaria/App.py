@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 import skimage.filters as skifil
 from skimage import io
 from skimage import color
@@ -12,6 +13,7 @@ import numpy as np
 import cv2
 import os
 import json
+
 
 
 def pegar_caminho_imagens(pasta):
@@ -114,6 +116,8 @@ for img in imagens:
 
         centros = []  # armazena os centros dos círculos já desenhados
 
+        bounding_boxes = []
+
         for centro_y, centro_x, radius in zip(b, a, raio):
             # verifica se o centro atual está próximo demais de um círculo já desenhado
             is_close = False
@@ -125,10 +129,15 @@ for img in imagens:
                 image[circy, circx] = (20, 20, 220) #BGR
 
             if not is_close:
-               # Extrai uma região quadrada em torno do centro
+               # Define as coordenadas mínimas e máximas para a região quadrada
                 tamanho_regiao = 30
-                regiao = image[centro_y - tamanho_regiao:centro_y + tamanho_regiao,
-                               centro_x - tamanho_regiao:centro_x + tamanho_regiao]
+                min_y = max(0, centro_y - tamanho_regiao)
+                max_y = min(image.shape[0], centro_y + tamanho_regiao)
+                min_x = max(0, centro_x - tamanho_regiao)
+                max_x = min(image.shape[1], centro_x + tamanho_regiao)
+
+                # Extrai a região quadrada em torno do centro
+                regiao = image[min_y:max_y, min_x:max_x]
 
                 # Calcula a média dos valores de pixel da região
                 media_pixel = np.mean(regiao)
@@ -139,9 +148,31 @@ for img in imagens:
                     image[circy, circx] = (20, 220, 20)  # BGR
                     centros.append((centro_y, centro_x))
 
+                    # Calcular as coordenadas mínimas e máximas da bounding box
+                    minimum = {'r': int(max(0, centro_y - radius)), 'c': int(max(0, centro_x - radius))}
+                    maximum = {'r': int(centro_y + radius), 'c': int(centro_x + radius)}
+                
+                    # Armazenar as coordenadas mínimas e máximas em um dicionário
+                    bounding_box = {'minimum': minimum, 'maximum': maximum}
+                
+                    # Adicionar o dicionário à lista de bounding boxes
+                    bounding_boxes.append(bounding_box)
+
+                    # # Calcular as coordenadas dos pontos de início (canto superior esquerdo) e término (canto inferior direito) da bounding box
+                    # start_y = centro_y - radius
+                    # end_y = centro_y + radius
+                    # start_x = centro_x - radius
+                    # end_x = centro_x + radius
+
+                    # # Criar um retângulo correspondente à bounding box
+                    # rect = Rectangle((start_x, start_y), end_x - start_x, end_y - start_y, linewidth=1, edgecolor='r', facecolor='none')
+
+                    # ax.add_patch(rect)
 
         num_circles = np.sum(~np.isnan(centros))
         print(len(centros))
+        # for box in bounding_boxes:
+        #     print(box)
         # cv2.imshow('Imagem',canal[2])
         cv2.imshow('Imagem', image)
         cv2.waitKey(0)
