@@ -26,6 +26,60 @@ def pegar_caminho_imagens(pasta):
             caminho_imagens.append(os.path.join(pasta, arquivo))
     return caminho_imagens
 
+# Função para calcular a área de uma bounding-box
+def bbox_area(bbox):
+    # Adicionamos + 1 a cada diferença para considerar que a bbox inclui tanto as coordenadas mínimas quanto as máximas.
+    return (bbox['maximum']['r'] - bbox['minimum']['r'] + 1) * (bbox['maximum']['c'] - bbox['minimum']['c'] + 1)
+
+# Função para calcular o IoU entre as duas bounding-box
+def bbox_iou(bbox1, bbox2):
+    # Calcula a intersecção entre as duas bounding-box
+    xA = max(bbox1['minimum']['c'], bbox2['minimum']['c'])
+    yA = max(bbox1['minimum']['r'], bbox2['minimum']['r'])
+    xB = min(bbox1['maximum']['c'], bbox2['maximum']['c'])
+    yB = min(bbox1['maximum']['r'], bbox2['maximum']['r'])
+
+    # Calcula a área de intersecção e união das duas bbox
+    interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
+    unionArea = bbox_area(bbox1) + bbox_area(bbox2) - interArea
+
+    # Calcula o valor de IoU
+    iou = interArea / unionArea
+
+    return iou
+
+# Função para comparar as bounding-box e retornar a Precision, Recall e F1 score
+def comparar_bounding_boxes(bboxes_obtidas, bboxes_base):
+    if len(bboxes_obtidas) != 0:
+        true_positives = 0
+        false_positives = 0
+        false_negatives = 0
+
+        for bbox_obtida in bboxes_obtidas:
+            bbox_correpondente = False
+            for bbox_base in bboxes_base:
+                # # Calculando o IoU entre as bbox
+                iou = bbox_iou(bbox_base, bbox_obtida)
+                # Verifica se o limiar e superior a 50% 
+                if iou >= 0.5:
+                    print("IoU: {:.2f}%".format(iou*100))
+                    true_positives += 1
+                    bbox_correpondente = True
+                    break
+            if not bbox_correpondente:
+                false_positives += 1
+
+        false_negatives = len(bboxes_base) - true_positives
+
+        P = true_positives / (true_positives + false_positives)
+        R = true_positives / (true_positives + false_negatives)
+        F1 = 2 * (P * R) / (P + R)
+
+        # Retornando a Precision, Recall e F1 score obtidas.
+        return P, R, F1
+    else:
+        return 0, 0, 0
+
 
 pasta = 'Projeto_Malaria/malaria/images' 
 arquivo_json = 'Projeto_Malaria/malaria/training.json'  
@@ -37,9 +91,7 @@ with open(arquivo_json) as arquivo:
     # Lê todo o arquivo e converte para um objeto Python
     objeto_python = json.load(arquivo)
 
-cont = 0
 i = 0
-quant_box = 0
 for img in imagens:
     if img is None:
         print('Não foi possível carregar a imagem')
@@ -49,23 +101,25 @@ for img in imagens:
         i +=1
         for item in objeto_python:
             if procurar_img in item['image']['pathname']:
-                print("'{}' foi encontrada no arquivo JSON!".format(procurar_img),cont ,i)
+                print("'{}' foi encontrada no arquivo JSON!".format(procurar_img) ,i)
                 objetos = item['objects']
-                print("objetos -> '{}'".format(len(objetos)))
-                quant_box = len(objetos)
+                bboxes_base = []
+                # print("objetos -> '{}'".format(len(objetos)))
                 for objeto in objetos:
-                    # if "bounding_box" in objeto:
-                        if "category" in objeto:
-                            if objeto["category"] != "red blood cell":
-                                print(objeto["category"])
-                        else:
-                            print("Objeto não tem categoria definida.")
-                    # else:
-                    #     print("Objeto não tem caixa delimitadora (bounding box) definida.")
-                break
-            else:
-                cont += 1
+                    if "bounding_box" in objeto:
+                        bbox = objeto['bounding_box']
+                        # # Calcular as coordenadas mínimas e máximas da bounding box
+                        minimum = {'r': int(bbox['minimum']['r']), 'c': int(bbox['minimum']['c'])}
+                        maximum = {'r': int(bbox['maximum']['r']), 'c': int(bbox['maximum']['c'])}
 
+                        # # Armazenar as coordenadas mínimas e máximas em um dicionário
+                        bbox = {'minimum': minimum, 'maximum': maximum}
+
+                        # # Adicionar o dicionário à lista de bounding boxes
+                        bboxes_base.append(bbox)  
+                    else:
+                        print("Objeto não tem caixa delimitadora (bounding box) definida.")
+        
         img = io.imread(img)
         canais = cv2.split(img)
         saturation = canais [1]
@@ -148,7 +202,6 @@ for img in imagens:
                     bounding_boxes.append(bounding_box)                    
 
                     # Desenhe as bounding boxes na imagem copiada
-                    
                     # for bbox in bounding_boxes:
                     #     minimum = bbox['minimum']
                     #     maximum = bbox['maximum']
@@ -158,11 +211,31 @@ for img in imagens:
                     #     # Desenhe a bounding box na imagem copiada
                     #     cv2.rectangle(image_copy, (min_col, min_row), (max_col, max_row), (0, 255, 0), 2)
 
-        num_circles = np.sum(~np.isnan(centros))
-        print(len(centros))
-        # for box in bounding_boxes:
-        #     print(box)
-        
+        # num_circles = np.sum(~np.isnan(centros))
+        # print(len(centros))
+        # for bbox_obtida in bounding_boxes:
+        #     for bbox_base_de_dados in bboxes:
+        #         # # Calculando o IoU entre as bbox
+        #         iou = bbox_iou(bbox_base_de_dados, bbox_obtida)
+        #         # Usando o valor de IoU para calcular a precisão, revocação e pontuação F1
+        #         if iou >= 0.5:
+        #             precision = 1.0
+        #             recall = 1.0
+        #             f1_score = 1.0
+        #             print("IoU: {}%".format(iou*100))
+        #             print("Precision: ", precision)
+        #             print("Recall: ", recall)
+        #             print("F1 score: ", f1_score)
+        #             break
+        #         else:
+        #             precision = 0.0
+        #             recall = 0.0
+        #             f1_score = 0.0
+        P, R, F1 = comparar_bounding_boxes(bounding_boxes,bboxes_base)
+        print("Precision: ", P)
+        print("Recall: ", R)
+        print("F1 score: ", F1)
+                
         # cv2.imshow('Imagem', image)
         # cv2.imshow('Imagem',image_copy)
         cv2.waitKey(0)
@@ -173,4 +246,3 @@ for img in imagens:
         # ax[1].axis("off")
         # ax[1].imshow(rect)
         # plt.show()
-
