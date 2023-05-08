@@ -212,12 +212,12 @@ for img in imagens:
 
         # Executa a comparação das bouding-boxes obtidase da base e exibe no terminal os resultados                    
         P, R, F1 = comparar_bounding_boxes(bounding_boxes,bboxes_base)
-        print("\n-------------------------")
+        print("\n-------------------------------------------------")
         print("Imagem: {}".format(procurar_img))
         print("Precision: {:.2f}%".format(P*100))
         print("Recall: {:.2f}%".format(R*100))
         print("F1 score: {:.2f}%".format(F1*100))
-        print("-------------------------")
+        print("-------------------------------------------------")
         
         # Para uma melhor visualização dos circulos descomente a exibição com Opencv e comente a do plt
         # image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
@@ -226,9 +226,11 @@ for img in imagens:
         # cv2.destroyAllWindows()
 
         # Para deixar exibição dos resultados mais rapida comente a exibição do plt abaixo
-        fig, ax = plt.subplots(1,2, figsize=(24,12))
-        ax[0].axis("off")
-        ax[0].imshow(img)
-        ax[1].axis("off")
-        ax[1].imshow(image)
-        plt.show()
+        # fig, ax = plt.subplots(1,2, figsize=(24,12))
+        # ax[0].axis("off")
+        # ax[0].set_title("Imagem Original")
+        # ax[0].imshow(img)
+        # ax[1].axis("off")
+        # ax[1].set_title("Imagem")
+        # ax[1].imshow(image)
+        # plt.show()
