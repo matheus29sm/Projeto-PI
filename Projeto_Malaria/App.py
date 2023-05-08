@@ -1,7 +1,4 @@
-
-from matplotlib.patches import Rectangle
 from skimage import io
-from skimage import color
 from skimage.filters import sobel
 from skimage.draw import circle_perimeter
 from skimage.morphology import *
@@ -62,7 +59,7 @@ def comparar_bounding_boxes(bboxes_obtidas, bboxes_base):
                 iou = bbox_iou(bbox_base, bbox_obtida)
                 # Verifica se o limiar e superior a 50% 
                 if iou >= 0.5:
-                    print("IoU: {:.2f}%".format(iou*100))
+                    # print("IoU: {:.2f}%".format(iou*100))
                     true_positives += 1
                     bbox_correpondente = True
                     break
@@ -91,17 +88,15 @@ with open(arquivo_json) as arquivo:
     # Lê todo o arquivo e converte para um objeto Python
     objeto_python = json.load(arquivo)
 
-i = 0
 for img in imagens:
     if img is None:
         print('Não foi possível carregar a imagem')
     else:
         # Procurando uma string em um dicionário dentro do objeto Python
         procurar_img = img[31:]
-        i +=1
         for item in objeto_python:
             if procurar_img in item['image']['pathname']:
-                print("'{}' foi encontrada no arquivo JSON!".format(procurar_img) ,i)
+                # print("'{}' foi encontrada no arquivo JSON!".format(procurar_img) ,i)
                 objetos = item['objects']
                 bboxes_base = []
                 # print("objetos -> '{}'".format(len(objetos)))
@@ -153,8 +148,7 @@ for img in imagens:
 
         acumulador, a, b, raio = hough_circle_peaks (hough_grade, raios,50, 50,total_num_peaks = 150)
 
-        image = color.gray2rgb(saturation)
-        image_copy = np.copy(image)
+        image = img.copy()
 
         # Armazena os centros dos círculos já desenhados
         centros = []
@@ -169,7 +163,7 @@ for img in imagens:
 
             if not is_close:
                 circy, circx = circle_perimeter(centro_y, centro_x, radius, shape=image.shape)
-                image[circy, circx] = (20, 20, 220) #BGR
+                image[circy, circx] = (220, 20, 20) #BGR
 
             if not is_close:
                # Define as coordenadas mínimas e máximas para a região quadrada
@@ -186,9 +180,10 @@ for img in imagens:
                 media_pixel = np.mean(regiao)
 
                 if media_pixel < 200:
+
                     # A região possui uma média de pixel alta, considerada como branca
                     circy, circx = circle_perimeter(centro_y, centro_x, radius, shape=image.shape)
-                    image[circy, circx] = (20, 220, 20)  # BGR
+                    image[circy, circx] = (20, 220, 20)
                     centros.append((centro_y, centro_x))
 
                     # Calcular as coordenadas mínimas e máximas da bounding box
@@ -201,48 +196,24 @@ for img in imagens:
                     # Adicionar o dicionário à lista de bounding boxes
                     bounding_boxes.append(bounding_box)                    
 
-                    # Desenhe as bounding boxes na imagem copiada
-                    # for bbox in bounding_boxes:
-                    #     minimum = bbox['minimum']
-                    #     maximum = bbox['maximum']
-                    #     min_row, min_col = minimum['r'], minimum['c']
-                    #     max_row, max_col = maximum['r'], maximum['c']
-
-                    #     # Desenhe a bounding box na imagem copiada
-                    #     cv2.rectangle(image_copy, (min_col, min_row), (max_col, max_row), (0, 255, 0), 2)
-
-        # num_circles = np.sum(~np.isnan(centros))
-        # print(len(centros))
-        # for bbox_obtida in bounding_boxes:
-        #     for bbox_base_de_dados in bboxes:
-        #         # # Calculando o IoU entre as bbox
-        #         iou = bbox_iou(bbox_base_de_dados, bbox_obtida)
-        #         # Usando o valor de IoU para calcular a precisão, revocação e pontuação F1
-        #         if iou >= 0.5:
-        #             precision = 1.0
-        #             recall = 1.0
-        #             f1_score = 1.0
-        #             print("IoU: {}%".format(iou*100))
-        #             print("Precision: ", precision)
-        #             print("Recall: ", recall)
-        #             print("F1 score: ", f1_score)
-        #             break
-        #         else:
-        #             precision = 0.0
-        #             recall = 0.0
-        #             f1_score = 0.0
         P, R, F1 = comparar_bounding_boxes(bounding_boxes,bboxes_base)
-        print("Precision: ", P)
-        print("Recall: ", R)
-        print("F1 score: ", F1)
-                
-        # cv2.imshow('Imagem', image)
-        # cv2.imshow('Imagem',image_copy)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        print("\n-------------------------")
+        print("Imagem: {}".format(procurar_img))
+        print("Precision: {:.2f}%".format(P*100))
+        print("Recall: {:.2f}%".format(R*100))
+        print("F1 score: {:.2f}%".format(F1*100))
+        print("-------------------------")
+        
+        # Para uma melhor visualização dos circulos descomente a exibição com Opencv e comente a do plt
+        # image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+        # cv2.imshow('Imagem',image)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+
+        # Para deixar exibição dos resultados mais rapida comente a exibição do plt abaixo
         # fig, ax = plt.subplots(1,2, figsize=(24,12))
         # ax[0].axis("off")
-        # ax[0].imshow(image)
+        # ax[0].imshow(img)
         # ax[1].axis("off")
-        # ax[1].imshow(rect)
+        # ax[1].imshow(image)
         # plt.show()
